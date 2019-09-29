@@ -12,21 +12,20 @@ export class LecturesService {
         var hrAtual = hrInicio;
         var lista = this.setTiming(data);
         var hora = this.formatHour(hrInicio);
-        var lectures = []
+        var lectures = []   
         var hrs = new Date('2019-01-01 09:00:00');
 
 
-        var lunch = this.formatHour(hrLunch) + ' Lunch.'
-        var networkEvent = this.formatHour(hrNetwork) + ' Network Event.'
+        var lunch = [this.formatHour(hrLunch), 'Lunch'].join(" ");
+        var networkEvent = [this.formatHour(hrNetwork), 'Network Event'].join(" ");
 
         lista.forEach(lecture => {
             var timing = new Date(`2019-01-01 00:${lecture['timing']}:00`);
-         
+           
             var lec = [this.formatHour(hrs), lecture.lecture].join(" "); 
             lectures.push(lec); 
             hrs.setMinutes(hrInicio.getHours() + lecture['timing']);
-            console.log(lecture['timing']);
-            console.log();
+            
 
         });
         
