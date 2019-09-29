@@ -10,6 +10,12 @@ export class LecturesService {
         const hrInicio = '09:00:00';
         const hrLunch = '12:00:00';
         const hrNetwork = '17:00:00';
+        
+        var hrManha = '00:00:00';
+        var manha = [];
+
+        var hrTarde = '00:00:00';
+        var tarde = [];
 
         var hrAtual = hrInicio;
         var lista = this.setTiming(data);
@@ -17,18 +23,29 @@ export class LecturesService {
         var lectures = []   
      
 
-        var lunch = [this.formatHour(hrLunch), 'Lunch'].join(" ");
-        var networkEvent = [this.formatHour(hrNetwork), 'Network Event'].join(" ");
+        var lunch = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Lunch'].join(" ");
+        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Network Event'].join(" ");
 
         lista.forEach(lecture => {
             var timing = `00:${lecture['timing']}:00`;
             var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
-            lectures.push(lec); 
-            hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+            if (hrManha != '03:00:00') {
+                manha.push(lec); 
+                hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+                hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
+            } else if (hrTarde != '04:00:00') {
+                hora = this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00'));
+                tarde.push(lec);
+                hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+                hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
+              
+            }
 
         });
+
+        var cronograma = [manha, tarde].join();
         
-        return lectures
+        return cronograma
     }
     formatHour(hour) {
         var hr = hour.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
@@ -81,6 +98,4 @@ export class LecturesService {
                 this.pad(seconds%60),
                 ].join(":");
       }
-    
-
 }
