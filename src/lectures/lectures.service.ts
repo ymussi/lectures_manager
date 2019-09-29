@@ -1,31 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { type } from 'os';
+import { parseISO, isAfter, format } from 'date-fns';
+
 
 @Injectable()
 export class LecturesService {
     
     createTracks(data: string) {
-        const hrInicio = new Date('2019-01-01 09:00:00');
-        const hrLunch = new Date('2019-01-01 12:00:00');
-        const hrNetwork = new Date('2019-01-01 17:00:00');
+
+        const hrInicio = '09:00:00';
+        const hrLunch = '12:00:00';
+        const hrNetwork = '17:00:00';
 
         var hrAtual = hrInicio;
         var lista = this.setTiming(data);
-        var hora = this.formatHour(hrInicio);
+        var hora = hrInicio;
         var lectures = []   
-        var hrs = new Date('2019-01-01 09:00:00');
-
+     
 
         var lunch = [this.formatHour(hrLunch), 'Lunch'].join(" ");
         var networkEvent = [this.formatHour(hrNetwork), 'Network Event'].join(" ");
 
         lista.forEach(lecture => {
-            var timing = new Date(`2019-01-01 00:${lecture['timing']}:00`);
-           
-            var lec = [this.formatHour(hrs), lecture.lecture].join(" "); 
+            var timing = `00:${lecture['timing']}:00`;
+            var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
             lectures.push(lec); 
-            hrs.setMinutes(hrInicio.getHours() + lecture['timing']);
-            
+            hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
 
         });
         
@@ -61,6 +60,27 @@ export class LecturesService {
 
         return lista
     }
+    timestrToSec(timestr) {
+        var parts = timestr.split(":");
+        return (parts[0] * 3600) +
+               (parts[1] * 60) +
+               (+parts[2]);
+      }
+      
+    pad(num) {
+        if(num < 10) {
+          return "0" + num;
+        } else {
+          return "" + num;
+        }
+      }
+      
+    formatTime(seconds) {
+        return [this.pad(Math.floor(seconds/3600)),
+                this.pad(Math.floor(seconds/60)%60),
+                this.pad(seconds%60),
+                ].join(":");
+      }
     
 
 }
