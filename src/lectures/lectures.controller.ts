@@ -7,7 +7,7 @@ export class LecturesController {
     constructor(private lectureService: LecturesService) {}
 
     @Post()
-    createTracks(@Body() body) {
-        return this.lectureService.createTracks(body);
+    createCronogram(@Body() body) {
+        return this.lectureService.createCronogram(body);
     }
 }

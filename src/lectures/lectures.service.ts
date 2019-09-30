@@ -1,52 +1,71 @@
 import { Injectable } from '@nestjs/common';
 import { parseISO, isAfter, format } from 'date-fns';
+import { continueStatement, breakStatement } from '@babel/types';
 
 
 @Injectable()
 export class LecturesService {
     
-    createTracks(data: string) {
+    createCronogram(data: string) {
 
         const hrInicio = '09:00:00';
         const hrLunch = '12:00:00';
         const hrNetwork = '17:00:00';
         
         var hrManha = '00:00:00';
-        var manha = [];
-
         var hrTarde = '00:00:00';
-        var tarde = [];
 
-        var hrAtual = hrInicio;
         var lista = this.setTiming(data);
         var hora = hrInicio;
-        var lectures = []   
+        var track = 0
+        var lectures = []
+        var cronograma = {
+            "data": []
+        };
      
 
         var lunch = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Lunch'].join(" ");
-        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Network Event'].join(" ");
+        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrNetwork}`)), 'Network Event'].join(" ");
 
         lista.forEach(lecture => {
             var timing = `00:${lecture['timing']}:00`;
-            var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
+            
             if (hrManha != '03:00:00') {
-                manha.push(lec); 
+                var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
+                lectures.push(lec); 
                 hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
                 hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
-            } else if (hrTarde != '04:00:00') {
-                hora = this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00'));
-                tarde.push(lec);
-                hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
-                hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
-              
-            }
-
+            } else {
+                if (hrTarde <= '04:00:00') {
+                    var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
+                    lectures.push(lec);
+                    hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+                    hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
+                }                             
+            } 
+            if (hora == hrLunch) {
+                lectures.push(lunch);
+                hora = '13:00:00';
+            } 
+            
+            
         });
-
-        var cronograma = [manha, tarde].join();
+        hora = hrNetwork;
+        lectures.push(networkEvent);
+        var tracks = this.setTracks(lectures);
+        cronograma['data'].push(tracks);
         
         return cronograma
     }
+    setTracks(lectures) {
+        var track = 0
+        var tracks = {
+            "title": `track ${track + 1}`,
+            "data": lectures
+        }
+        return tracks
+    }
+
     formatHour(hour) {
         var hr = hour.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
 
