@@ -102,7 +102,10 @@ export class LecturesService {
 
     formatHour(hour) {
         var hr = hour.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
-
+        
+        if (hour < parseISO('2019-01-01 10:00:00') || hour > parseISO('2019-01-01 12:00:00')) {
+            hr = `0${hr}`;
+        }
         return hr;
     }
     setTiming(data: string) {
