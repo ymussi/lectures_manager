@@ -4,6 +4,17 @@ import { parseISO, isAfter, format } from 'date-fns';
 
 @Injectable()
 export class LecturesService {
+
+    // createCronogram(data: string) {
+    //     var lista = this.setTiming(data);
+    //     var dados = []
+
+    //     lista.forEach(lectures => {
+            
+    //     });
+
+        
+    // }
     
     createCronogram(data: string) {
 
@@ -25,6 +36,7 @@ export class LecturesService {
      
 
         var lunch = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Lunch'].join(" ");
+        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrNetwork}`)), 'Network Event'].join(" ");
         
         lista.forEach(lecture => {
             var timing = `00:${lecture['timing']}:00`;
@@ -49,7 +61,7 @@ export class LecturesService {
                 hora = '13:00:00';
             } 
         });
-        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
+        // var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
         if (hora >= '16:00:00' && hora <= '17:00:00') {
             lectures.push(networkEvent);
         }
@@ -85,7 +97,7 @@ export class LecturesService {
                 } 
             }
         });
-        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
+        // var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
         if (hora >= '16:00:00' && hora <= '17:00:00') {
             lectures.push(networkEvent);
         }
@@ -133,8 +145,21 @@ export class LecturesService {
             }
             lista.push(lec)
         }); 
+        // var res = this.eachTiming(lista);
 
         return lista
+    }
+    eachTiming(data) {
+        var tempo = []
+        data.forEach(lecture => {
+            var include = tempo['time'].includes(lecture['timing']);
+            if (!include) {
+                
+                tempo['time'].push(lecture['timing']);
+            }            
+        });
+
+        return tempo
     }
     timestrToSec(timestr) {
         var parts = timestr.split(":");
