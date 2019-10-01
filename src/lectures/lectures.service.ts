@@ -25,8 +25,7 @@ export class LecturesService {
      
 
         var lunch = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Lunch'].join(" ");
-        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrNetwork}`)), 'Network Event'].join(" ");
-
+        
         lista.forEach(lecture => {
             var timing = `00:${lecture['timing']}:00`;
             
@@ -37,7 +36,7 @@ export class LecturesService {
                 hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
                 hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
             } else {
-                if (hrTarde <= '04:00:00') {
+                if (hrTarde <= '03:00:00') {
                     var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
                     lectures.push(lec);
                     track.push(lecture); 
@@ -50,8 +49,10 @@ export class LecturesService {
                 hora = '13:00:00';
             } 
         });
-        hora = hrNetwork;
-        lectures.push(networkEvent);
+        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
+        if (hora >= '16:00:00' && hora <= '17:00:00') {
+            lectures.push(networkEvent);
+        }
         var tracks = this.setTracks(lectures, nTrack);
         cronograma['data'].push(tracks);
 
@@ -71,7 +72,7 @@ export class LecturesService {
                     hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
                     hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
                 } else {
-                    if (hrTarde <= '04:00:00') {
+                    if (hrTarde <= '03:00:00') {
                         var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
                         lectures.push(lec);
                         hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
@@ -84,9 +85,11 @@ export class LecturesService {
                 } 
             }
         });
-       
-        hora = hrNetwork;
-        lectures.push(networkEvent);
+        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
+        if (hora >= '16:00:00' && hora <= '17:00:00') {
+            lectures.push(networkEvent);
+        }
+
         var tracks = this.setTracks(lectures, nTrack + 1);
         cronograma['data'].push(tracks);
         
