@@ -17,6 +17,7 @@ export class LecturesService {
         var lista = this.setTiming(data);
         var hora = hrInicio;
         var track = []
+        var nTrack = 1
         var lectures = []
         var cronograma = {
             "data": []
@@ -44,14 +45,14 @@ export class LecturesService {
                     hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
                 }                             
             } 
-            if (hora == hrLunch) {
+            if (hora >= hrLunch && hora < (this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00')))) {
                 lectures.push(lunch);
                 hora = '13:00:00';
             } 
         });
         hora = hrNetwork;
         lectures.push(networkEvent);
-        var tracks = this.setTracks(lectures);
+        var tracks = this.setTracks(lectures, nTrack);
         cronograma['data'].push(tracks);
 
         hrManha = '00:00:00';
@@ -77,7 +78,7 @@ export class LecturesService {
                         hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
                     }                             
                 } 
-                if (hora == hrLunch) {
+                if (hora >= hrLunch && hora < (this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00')))) {
                     lectures.push(lunch);
                     hora = '13:00:00';
                 } 
@@ -86,15 +87,14 @@ export class LecturesService {
        
         hora = hrNetwork;
         lectures.push(networkEvent);
-        var tracks = this.setTracks(lectures);
+        var tracks = this.setTracks(lectures, nTrack + 1);
         cronograma['data'].push(tracks);
         
         return cronograma
     }
-    setTracks(lectures) {
-        var track = 0
+    setTracks(lectures, track) {
         var tracks = {
-            "title": `track ${track + 1}`,
+            "title": `track ${track}`,
             "data": lectures
         }
         return tracks
