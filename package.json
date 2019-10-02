@@ -26,7 +26,9 @@
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
-    "time-delta": "0.0.2"
+    "time-delta": "0.0.2",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.2"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",
