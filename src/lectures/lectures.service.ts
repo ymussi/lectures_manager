@@ -4,54 +4,36 @@ import { parseISO, isAfter, format } from 'date-fns';
 
 @Injectable()
 export class LecturesService {
-
-    // createCronogram(data: string) {
-    //     var lista = this.setTiming(data);
-    //     var dados = []
-
-    //     lista.forEach(lectures => {
-            
-    //     });
-
-        
-    // }
-    
-    createCronogram(data: string) {
-
+    criarTrackss(data, trac) {
         const hrInicio = '09:00:00';
         const hrLunch = '12:00:00';
         const hrNetwork = '17:00:00';
         
         var hrManha = '00:00:00';
         var hrTarde = '00:00:00';
-
         var lista = this.setTiming(data);
         var hora = hrInicio;
         var track = []
-        var nTrack = 1
-        var lectures = []
-        var cronograma = {
-            "data": []
-        };
-     
-
+        var lectures = []     
+        
         var lunch = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Lunch'].join(" ");
         var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrNetwork}`)), 'Network Event'].join(" ");
         
+        // console.log(lista)
         lista.forEach(lecture => {
             var timing = `00:${lecture['timing']}:00`;
             
             if (hrManha != '03:00:00') {
                 var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
                 lectures.push(lec);
-                track.push(lecture); 
+                track.push(lecture['lecture']); 
                 hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
                 hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
             } else {
                 if (hrTarde <= '03:00:00') {
                     var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
                     lectures.push(lec);
-                    track.push(lecture); 
+                    track.push(lecture['lecture']); 
                     hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
                     hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
                 }                             
@@ -61,52 +43,209 @@ export class LecturesService {
                 hora = '13:00:00';
             } 
         });
-        // var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
         if (hora >= '16:00:00' && hora <= '17:00:00') {
             lectures.push(networkEvent);
         }
-        var tracks = this.setTracks(lectures, nTrack);
-        cronograma['data'].push(tracks);
+        var tracks = this.setTracks(lectures, trac);
+        // console.log(track);
 
-        hrManha = '00:00:00';
-        hrTarde = '00:00:00';
-        hora = hrInicio;
-        lectures = []
+        return [tracks, track]
+    }
+    criarTracks(data, trac) {
+        const hrInicio = '09:00:00';
+        const hrLunch = '12:00:00';
+        const hrNetwork = '17:00:00';
+        
+        var hrManha = '00:00:00';
+        var hrTarde = '00:00:00';
+        var lista = this.setTiming(data);
+        var tempo = this.eachTiming(lista);
+        var hora = hrInicio;
+        var track = []
+        var lectures = []     
 
+        var lunch = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Lunch'].join(" ");
+        var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrNetwork}`)), 'Network Event'].join(" ");
+        
         lista.forEach(lecture => {
             var timing = `00:${lecture['timing']}:00`;
             
-            var l = track.includes(lecture);
-            if (!l) {
-                if (hrManha != '03:00:00') {
-                    var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
+            if (hrManha <= '03:00:00' && hora <= hrLunch) {
+                var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
+                lectures.push(lec);
+                track.push(lecture['lecture']); 
+                hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+                hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
+            } else {
+                if (hrTarde <= '03:00:00') {
+                    var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
                     lectures.push(lec);
+                    track.push(lecture['lecture']); 
                     hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
-                    hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
-                } else {
-                    if (hrTarde <= '03:00:00') {
-                        var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
-                        lectures.push(lec);
-                        hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
-                        hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
-                    }                             
-                } 
-                if (hora >= hrLunch && hora < (this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00')))) {
-                    lectures.push(lunch);
-                    hora = '13:00:00';
-                } 
-            }
+                    hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
+                }                             
+            } 
+            if (hora >= hrLunch && hora < (this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00')))) {
+                lectures.push(lunch);
+                hora = '13:00:00';
+            } 
         });
-        // var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), 'Network Event'].join(" ");
         if (hora >= '16:00:00' && hora <= '17:00:00') {
             lectures.push(networkEvent);
         }
+        var tracks = this.setTracks(lectures, trac);
 
-        var tracks = this.setTracks(lectures, nTrack + 1);
-        cronograma['data'].push(tracks);
-        
+        return [tracks, track]
+    }
+    diffArray (a1, a2) {
+        var a = [], diff = [];
+        for (var i = 0; i < a1.length; i++) {
+            a[a1[i]] = true;
+        }
+    
+        for (var i = 0; i < a2.length; i++) {
+            if (a[a2[i]]) {
+                delete a[a2[i]];
+            } else {
+                a[a2[i]] = true;
+            }
+        }
+    
+        for (var k in a) {
+            diff.push(k);
+        }
+    
+        return diff;
+    }
+
+    createCronogram(data: string) {
+        var lectures = [];
+        var tracks = []
+        var track = 0
+        var newData = {
+            'data': []
+        }
+        var cronograma = {
+            'data': []
+        }
+
+        while (true) {
+            var a = this.criarTracks(data, track += 1);
+            var lec = a[1];
+            lectures.push(lec)
+            tracks.push(a[0])
+
+            var diferenca = this.diffArray(data['data'], lec);
+            diferenca.forEach(diff => {
+                newData['data'].push(diff);
+            })
+
+            switch (diferenca.length) {
+                case 0:
+                    break;
+            
+                default:
+                    a = this.criarTracks(newData, track += 1);
+                    tracks.push(a[0])
+            }
+            
+            break
+        }
+        tracks.forEach(track => {
+            cronograma['data'].push(track)
+        })
         return cronograma
     }
+    
+    // createCronogramm(data: string) {
+
+    //     const hrInicio = '09:00:00';
+    //     const hrLunch = '12:00:00';
+    //     const hrNetwork = '17:00:00';
+        
+    //     var hrManha = '00:00:00';
+    //     var hrTarde = '00:00:00';
+
+    //     var lista = this.setTiming(data);
+    //     var hora = hrInicio;
+    //     var track = []
+    //     var numeroTrack = 1
+    //     var lectures = []
+    //     var cronograma = {
+    //         "data": []
+    //     };
+     
+
+    //     var lunch = [this.formatHour(parseISO(`2019-01-01 ${hrLunch}`)), 'Lunch'].join(" ");
+    //     var networkEvent = [this.formatHour(parseISO(`2019-01-01 ${hrNetwork}`)), 'Network Event'].join(" ");
+        
+    //     lista.forEach(lecture => {
+    //         var timing = `00:${lecture['timing']}:00`;
+            
+    //         if (hrManha != '03:00:00') {
+    //             var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
+    //             lectures.push(lec);
+    //             track.push(lecture); 
+    //             hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+    //             hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
+    //         } else {
+    //             if (hrTarde <= '03:00:00') {
+    //                 var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
+    //                 lectures.push(lec);
+    //                 track.push(lecture); 
+    //                 hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+    //                 hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
+    //             }                             
+    //         } 
+    //         if (hora >= hrLunch && hora < (this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00')))) {
+    //             lectures.push(lunch);
+    //             hora = '13:00:00';
+    //         } 
+    //     });
+    //     if (hora >= '16:00:00' && hora <= '17:00:00') {
+    //         lectures.push(networkEvent);
+    //     }
+    //     var tracks = this.setTracks(lectures, numeroTrack);
+    //     cronograma['data'].push(tracks);
+
+    //     hrManha = '00:00:00';
+    //     hrTarde = '00:00:00';
+    //     hora = hrInicio;
+    //     lectures = []
+
+    //     lista.forEach(lecture => {
+    //         var timing = `00:${lecture['timing']}:00`;
+            
+    //         var l = track.includes(lecture);
+    //         if (!l) {
+    //             if (hrManha != '03:00:00') {
+    //                 var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" "); 
+    //                 lectures.push(lec);
+    //                 hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+    //                 hrManha = this.formatTime(this.timestrToSec(hrManha) + this.timestrToSec(timing));
+    //             } else {
+    //                 if (hrTarde <= '03:00:00') {
+    //                     var lec = [this.formatHour(parseISO(`2019-01-01 ${hora}`)), lecture.lecture].join(" ");
+    //                     lectures.push(lec);
+    //                     hora = this.formatTime(this.timestrToSec(hora) + this.timestrToSec(timing));
+    //                     hrTarde = this.formatTime(this.timestrToSec(hrTarde) + this.timestrToSec(timing));
+    //                 }                             
+    //             } 
+    //             if (hora >= hrLunch && hora < (this.formatTime(this.timestrToSec(hrLunch) + this.timestrToSec('01:00:00')))) {
+    //                 lectures.push(lunch);
+    //                 hora = '13:00:00';
+    //             } 
+    //         }
+    //     });
+    //     if (hora >= '16:00:00' && hora <= '17:00:00') {
+    //         lectures.push(networkEvent);
+    //     }
+
+    //     var tracks = this.setTracks(lectures, numeroTrack + 1);
+    //     cronograma['data'].push(tracks);
+        
+    //     return cronograma
+    // }
     setTracks(lectures, track) {
         var tracks = {
             "title": `track ${track}`,
@@ -145,20 +284,19 @@ export class LecturesService {
             }
             lista.push(lec)
         }); 
-        // var res = this.eachTiming(lista);
+        // this.eachTiming(lista);
 
         return lista
     }
     eachTiming(data) {
         var tempo = []
         data.forEach(lecture => {
-            var include = tempo['time'].includes(lecture['timing']);
+            var include = tempo.includes(lecture['timing']);
             if (!include) {
                 
-                tempo['time'].push(lecture['timing']);
+                tempo.push(lecture['timing']);
             }            
         });
-
         return tempo
     }
     timestrToSec(timestr) {
