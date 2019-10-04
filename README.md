@@ -32,7 +32,8 @@ $ npm run start:dev
 
 ```bash
 #POST
-Send a post request to endpoint: https://task-lectures.herokuapp.com/lectures with a payload like this JSON:
+Send a post request to endpoint: https://task-lectures.herokuapp.com/lectures 
+with a payload like this JSON:
 
 {"data":[
         "Writing Fast Tests Against Enterprise Rails 60min",
