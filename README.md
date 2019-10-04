@@ -10,7 +10,7 @@
 
 ## Description
 
-Gerenciador de Palestras feito em NestJS
+Lectures Manager made in NestJS.
 
 ## Installation
 
@@ -67,6 +67,6 @@ and than, see what happens. =)
 # unit tests
 $ npm run test
 
-PS: Existe um probleminha neste teste, porém ainda não sei como resolver.
+PS: There's a little problem with this test, but I still don't know how to solve it.
 
 ```
