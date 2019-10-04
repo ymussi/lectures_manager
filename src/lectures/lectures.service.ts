@@ -147,7 +147,7 @@ export class LecturesService {
         }
         return hr;
     }
-    setTiming(data: string) {
+    setTiming(data) {
         /*
         Aqui é criado um array contendo um dicionario com nome e timing para cada palestra.
         */
