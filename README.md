@@ -32,7 +32,7 @@ $ npm run start:dev
 
 ```bash
 #POST
-Send a post request to endpoint: https://task-lectures.herokuapp.com/lectures 
+Send a post request to endpoint: https://lectures-manager.herokuapp.com/lectures 
 with a payload like this JSON:
 
 {"data":[
